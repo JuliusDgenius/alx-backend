@@ -1,5 +1,4 @@
 import redis from 'redis';
-import { promisify } from 'util';
 
 const client = redis.createClient();
 
@@ -21,17 +20,16 @@ const setNewSchool = (schoolName, value) => {
   });
 };
 
-const getAsync = promisify(client.GET);
-
-const displaySchoolValue = async (schoolName) => {
-  try {
-    const value = await getAsync(schoolName);
-    console.log(`${schoolName}: ${value}`);
-    redis.print(`Reply: ${value}`);
-  } catch (err) {
-    console.error(`Error getting value: ${err}`);
-  }
+const displaySchoolValue = (schoolName) => {
+  client.GET(schoolName, (err, value) => {
+    if (err) {
+      console.error(`Error getting value: ${err}`);
+    } else {
+      console.log(`${value}`);
+    }
+  });
 };
+
 
 displaySchoolValue('Holberton');
 setNewSchool('HolbertonSanFrancisco', '100');
